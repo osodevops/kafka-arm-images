@@ -1,0 +1,11 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Zookeeper
+metadata:
+  name: zookeeper
+spec:
+  image:
+    application: public.ecr.aws/oso-docker-registry/kate-zk:7.0.1.arm64
+    init: public.ecr.aws/oso-docker-registry/kate-init:7.0.1.arm64
+  dataVolumeCapacity: 10Gi
+  logVolumeCapacity: 10Gi
+  replicas: 1
