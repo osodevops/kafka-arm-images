@@ -4,7 +4,6 @@
 # Run `make readme` to rebuild the `README.md`
 #
 
-# Name of this project
 name: "Deploy Kafka / Confluent on Raspberry Pi"
 
 # Short description of this project
