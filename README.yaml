@@ -1,0 +1,27 @@
+---
+#
+# This is the canonical configuration for the `README.md`
+# Run `make readme` to rebuild the `README.md`
+#
+
+# Name of this project
+name: "Deploy Kafka / Confluent on Raspberry Pi"
+
+# Short description of this project
+description: |-
+  A Confluent CFK deployment on a Raspberry Pi using experimental ARM based Docker images. 
+
+# Canonical GitHub repo
+github_repo: osodevops/kafka-arm-images
+
+# How to use this project
+usage: |-
+  For
+
+
+# Example usage
+examples: |-
+  ### Deployment Process
+  
+
+related:
