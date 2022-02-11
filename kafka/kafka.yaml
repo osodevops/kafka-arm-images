@@ -1,0 +1,26 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Kafka
+metadata:
+  name: kafka
+spec:
+  image:
+    application: public.ecr.aws/oso-docker-registry/kate-server:7.0.1.arm64
+    init: public.ecr.aws/oso-docker-registry/kate-init:7.0.1.arm64
+  dataVolumeCapacity: 10Gi
+  configOverrides:
+    server:
+    - password.encoder.secret="foobar"
+    - auto.create.topics.enable=true
+    - confluent.license.topic.replication.factor=1
+    - confluent.tier.metadata.replication.factor=1
+    - confluent.metadata.topic.replication.factor=1
+    - confluent.balancer.topic.replication.factor=1
+    - confluent.security.event.logger.exporter.kafka.topic.replicas=1
+    - event.logger.exporter.kafka.topic.replicas=1
+    - offsets.topic.replication.factor=1
+  dependencies:
+    zookeeper:
+      endpoint: zookeeper:2181
+      tls:
+        enabled: false
+  replicas: 1
