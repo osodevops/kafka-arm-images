@@ -1,6 +1,6 @@
 
 <!-- markdownlint-disable -->
-# Deploy Kafka / Confluent on Raspberry Pi
+# Deploy Kafka / Confluent on a Raspberry Pi
 
 
 <!-- markdownlint-restore -->
@@ -46,6 +46,38 @@ For
 ## Examples
 
 ### Deployment Process
+1. Apply the Confluent CRDs using: `kubectl apply -k ./crds`
+  ```shell
+    ➜  kafka-arm-images git:(docs) ✗ kubectl apply -k ./crds
+    customresourcedefinition.apiextensions.k8s.io/clusterlinks.platform.confluent.io created
+    customresourcedefinition.apiextensions.k8s.io/confluentrolebindings.platform.confluent.io created
+    customresourcedefinition.apiextensions.k8s.io/connectors.platform.confluent.io created
+    customresourcedefinition.apiextensions.k8s.io/connects.platform.confluent.io created
+    customresourcedefinition.apiextensions.k8s.io/controlcenters.platform.confluent.io created
+    customresourcedefinition.apiextensions.k8s.io/kafkarestclasses.platform.confluent.io created
+    customresourcedefinition.apiextensions.k8s.io/kafkarestproxies.platform.confluent.io created
+    customresourcedefinition.apiextensions.k8s.io/kafkas.platform.confluent.io created
+    customresourcedefinition.apiextensions.k8s.io/kafkatopics.platform.confluent.io created
+    customresourcedefinition.apiextensions.k8s.io/ksqldbs.platform.confluent.io created
+    customresourcedefinition.apiextensions.k8s.io/migrationjobs.platform.confluent.io created
+    customresourcedefinition.apiextensions.k8s.io/schemaregistries.platform.confluent.io created
+    customresourcedefinition.apiextensions.k8s.io/schemas.platform.confluent.io created
+    customresourcedefinition.apiextensions.k8s.io/zookeepers.platform.confluent.io created
+  ```
+
+2. Depoy Operator, Zookeeper and Kafka ARM compatable images using: `kubectl apply -k .`
+  ```shell
+    ➜  kafka-arm-images git:(docs) ✗ kubectl apply -k .
+    namespace/sandbox created
+    serviceaccount/confluent-for-kubernetes created
+    clusterrole.rbac.authorization.k8s.io/confluent-operator created
+    clusterrolebinding.rbac.authorization.k8s.io/confluent-operator created
+    secret/confluent-operator-licensing created
+    service/confluent-operator created
+    deployment.apps/confluent-operator created
+    kafka.platform.confluent.io/kafka created
+    zookeeper.platform.confluent.io/zookeeper created
+  ```
 
 
 
