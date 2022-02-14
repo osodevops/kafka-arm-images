@@ -40,9 +40,18 @@ A Confluent CFK deployment on a Raspberry Pi using experimental ARM based Docker
 
 ## Usage
 
-For
+With the introduction of [Confluent For Kubernetes](https://docs.confluent.io/operator/current/overview.html) it has now been made possible to declaratively deploy Kafka at the edge. 
+This end to end example shows how to setup a Raspberry Pi and deploy Kafka with minimal configuration, its aimed to showcases the endless possible use cases of using Kafka as a storage and processing engine 
+at edge locations.
+
+The Cluster linking CRD can then be used to extend this deployment with a synchronous replication of topics.  
 
 ### Repository structure
+The Git repository contains the following top directories:
+- **crds** dir containing the Confluent Custom Resource Definitions (CRDs) which are used by the CFK Operator
+- **operator** deployment yaml required for Confluent For Kubernetes (CFK) to be deployed 
+- **zookeeper** kustomized version of Zookeeper CRD (single node)
+- **kafka** kustomized version of Kafka CRD (1 broker)
 
 
 
@@ -102,9 +111,9 @@ Now you have a K3S cluster up and running, we can move onto deploying the CFK co
     git clone git@github.com:osodevops/kafka-arm-images.git
   ```
 
-2. Apply the Confluent CRDs using: `kubectl apply -k /home/pi/kafka-arm-images/crds`
+2. Apply the Confluent CRDs using: `kubectl apply -k /home/pi/kafka-arm-images/crds/.`
   ```shell
-    ➜  kafka-arm-images git:(docs) ✗ kubectl apply -k /home/pi/kafka-arm-images/crds
+    ➜  kafka-arm-images git:(docs) ✗ kubectl apply -k /home/pi/kafka-arm-images/crds/.
     customresourcedefinition.apiextensions.k8s.io/clusterlinks.platform.confluent.io created
     customresourcedefinition.apiextensions.k8s.io/confluentrolebindings.platform.confluent.io created
     customresourcedefinition.apiextensions.k8s.io/connectors.platform.confluent.io created
@@ -144,6 +153,8 @@ Now you have a K3S cluster up and running, we can move onto deploying the CFK co
     zookeeper-0                          1/1     Running   0          11m
     kafka-0                              1/1     Running   0          11m
   ```
+
+4. Now the broker is up and running you can access the endpoint on `kafka:9071`
 
 
 
