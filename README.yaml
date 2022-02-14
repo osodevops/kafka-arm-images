@@ -9,7 +9,9 @@ name: "Deploy Kafka / Confluent on a Raspberry Pi"
 
 # Short description of this project
 description: |-
-  A Confluent CFK deployment on a Raspberry Pi using experimental ARM based Docker images. 
+  A Confluent CFK deployment on a Raspberry Pi using experimental ARM based Docker images.
+  
+  *NOTE: Please [contact us](mailto:enquiries@oso.sh) to gain access to these Docker images as they are stored on an OSO private registry* 
 
 # Canonical GitHub repo
 github_repo: osodevops/kafka-arm-images
@@ -18,10 +20,48 @@ github_repo: osodevops/kafka-arm-images
 usage: |-
   For
 
+  ### Repository structure
 
 # Example usage
 examples: |-
-  ### Deployment Process
+  ### Setup Raspberry Pi 
+  We need to prepare the device with a standard OS install so that we can run Kubernetes. .
+  1. *Install the baseOS* by following the instructions to install a 64bit Raspberry Pi OS as documented [here](https://www.raspberrypi.com/documentation/computers/getting-started.html)
+  
+  2. *Enable SSH on RaspberryPi* connect to the new raspberryPi image (SD Card), navigate to the `boot` directory, and create a file called `ssh`. This will allow a scripted instalation process to run quicker.
+  
+  3. *Enable CGroup memory* On line 1 of the file /boot/cmdline.txt append the following values:
+    ```shell
+      cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory
+    ```
+
+  4. *Configure Pi Networking* Add / Edit the file /etc/dchpd.conf, add the following (adjust as necessary to internal network)
+    ```shell
+      interface eth0
+      static ip_address=192.168.0.99/24
+      static routers=192.168.0.1
+      static domain_name_servers=192.168.0.1 8.8.8.8
+    ```
+  
+  ### Connect to Raspberry Pi (remotely)
+  Now we have setup the base configuration, we are able to connect over ssh and start the deployment process. 
+  1. *SSH onto RaspberryPi* using the following commands:
+    ```shell
+      ssh pi@192.168.0.99
+    ```
+    The password will be `raspberry`
+  
+  2. *Install GIT* Used to pull the configuration. Support for GitOps is important to enforce consistent configration over a fleet of devices
+    ```shell
+      sudo apt-get install git
+    ```
+  
+  3. *Install K3S* a lighestweisght Kubernetes distro designed to run on a small footprint under limited resources
+    ```shell
+      curl -sfL https://get.k3s.io | sh -s - --disable traefik --disable metrics-server
+    ```
+  
+  ### Deploy CFK on K3S
   1. Apply the Confluent CRDs using: `kubectl apply -k ./crds`
     ```shell
       ➜  kafka-arm-images git:(docs) ✗ kubectl apply -k ./crds
