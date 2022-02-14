@@ -51,16 +51,16 @@ For
 
 ### Setup Raspberry Pi 
 We need to prepare the device with a standard OS install so that we can run Kubernetes. .
-1. *Install the baseOS* by following the instructions to install a 64bit Raspberry Pi OS as documented [here](https://www.raspberrypi.com/documentation/computers/getting-started.html)
+1. **Install the baseOS** by following the instructions to install a 64bit Raspberry Pi OS as documented [here](https://www.raspberrypi.com/documentation/computers/getting-started.html)
 
-2. *Enable SSH on RaspberryPi* connect to the new raspberryPi image (SD Card), navigate to the `boot` directory, and create a file called `ssh`. This will allow a scripted instalation process to run quicker.
+2. **Enable SSH on RaspberryPi** connect to the new raspberryPi image (SD Card), navigate to the `boot` directory, and create a file called `ssh`. This will allow a scripted instalation process to run quicker.
 
-3. *Enable CGroup memory* On line 1 of the file /boot/cmdline.txt append the following values:
+3. **Enable CGroup memory** On line 1 of the file `/boot/cmdline.txt` append the following values:
   ```shell
     cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory
   ```
 
-4. *Configure Pi Networking* Add / Edit the file /etc/dchpd.conf, add the following (adjust as necessary to internal network)
+4. **Configure Pi Networking** Add / Edit the file `/etc/dchpd.conf`, add the following (adjust as necessary to internal network)
   ```shell
     interface eth0
     static ip_address=192.168.0.99/24
@@ -70,26 +70,41 @@ We need to prepare the device with a standard OS install so that we can run Kube
 
 ### Connect to Raspberry Pi (remotely)
 Now we have setup the base configuration, we are able to connect over ssh and start the deployment process. 
-1. *SSH onto RaspberryPi* using the following commands:
+1. **SSH onto RaspberryPi** using the following commands:
   ```shell
     ssh pi@192.168.0.99
   ```
   The password will be `raspberry`
 
-2. *Install GIT* Used to pull the configuration. Support for GitOps is important to enforce consistent configration over a fleet of devices
+2. **Install GIT** Used to pull the configuration. Support for GitOps is important to enforce consistent configration over a fleet of devices
   ```shell
     sudo apt-get install git
   ```
 
-3. *Install K3S* a lighestweisght Kubernetes distro designed to run on a small footprint under limited resources
+3. **Install K3S** a lighestweisght Kubernetes distro designed to run on a small footprint under limited resources
   ```shell
     curl -sfL https://get.k3s.io | sh -s - --disable traefik --disable metrics-server
   ```
 
-### Deploy CFK on K3S
-1. Apply the Confluent CRDs using: `kubectl apply -k ./crds`
+4. **Verify K8s cluster** Once the install is complete you should be able to run the following:
   ```shell
-    ➜  kafka-arm-images git:(docs) ✗ kubectl apply -k ./crds
+    ➜  ~ kubectl get nodes
+    NAME       STATUS   ROLES                  AGE    VERSION
+    k3s        Ready    control-plane,master   111m   v1.21.0
+  ```
+
+### Deploy CFK on K3S
+Now you have a K3S cluster up and running, we can move onto deploying the CFK components using Kustomize the configration in this repository. 
+1. Connect to the Pi via SSH, assume root and clone this repo:
+  ```shell
+    ssh pi@192.168.0.99
+    sudo -s
+    git clone git@github.com:osodevops/kafka-arm-images.git
+  ```
+
+2. Apply the Confluent CRDs using: `kubectl apply -k /home/pi/kafka-arm-images/crds`
+  ```shell
+    ➜  kafka-arm-images git:(docs) ✗ kubectl apply -k /home/pi/kafka-arm-images/crds
     customresourcedefinition.apiextensions.k8s.io/clusterlinks.platform.confluent.io created
     customresourcedefinition.apiextensions.k8s.io/confluentrolebindings.platform.confluent.io created
     customresourcedefinition.apiextensions.k8s.io/connectors.platform.confluent.io created
@@ -106,9 +121,9 @@ Now we have setup the base configuration, we are able to connect over ssh and st
     customresourcedefinition.apiextensions.k8s.io/zookeepers.platform.confluent.io created
   ```
 
-2. Depoy Operator, Zookeeper and Kafka ARM compatable images using: `kubectl apply -k .`
+2. Depoy Operator, Zookeeper and Kafka ARM compatable images using: `kubectl apply -k /home/pi/kafka-arm-images/.`
   ```shell
-    ➜  kafka-arm-images git:(docs) ✗ kubectl apply -k .
+    ➜  kafka-arm-images git:(docs) ✗ kubectl apply -k /home/pi/kafka-arm-images/.
     namespace/sandbox created
     serviceaccount/confluent-for-kubernetes created
     clusterrole.rbac.authorization.k8s.io/confluent-operator created
@@ -120,6 +135,16 @@ Now we have setup the base configuration, we are able to connect over ssh and st
     zookeeper.platform.confluent.io/zookeeper created
   ```
 
+3. Wait for the Kafka/Zookeeper service to come up.  If you wish to view the pods from an external Kubernetes UI, the kubeconfig information can be found at `/etc/rancher/k3s/k3s.yaml` You can monitor the pods using the following command:
+  ```shell
+    watch -n 1 kubectl get pods
+  
+    NAME                                 READY   STATUS    RESTARTS   AGE
+    confluent-operator-9b59cd5bd-bc9cg   1/1     Running   0          13m
+    zookeeper-0                          1/1     Running   0          11m
+    kafka-0                              1/1     Running   0          11m
+  ```
+
 
 
 
@@ -129,6 +154,9 @@ Now we have setup the base configuration, we are able to connect over ssh and st
 Check out these related projects.
 
 - [Confluent for Kubernetes (CFK) examples](https://github.com/osodevops/confluent-kubernetes-playground) - Playground for Kafka / Confluent Kubernetes experimentations
+- [Kafka GitOps Example](https://github.com/osodevops/kafka-gitops-examples) - A Kafka / Confluent GitOps workflow example for multi-env deployments with Flux, Kustomize, Helm and Confluent Operator
+- [Confluent Platform on Azure](https://github.com/osodevops/terraform-azure-confluent-platform) - Terraform Module for deploying best practice HA Confluent Platform on Azure
+- [Run Confluent Platform locally with Vagrant](https://github.com/osodevops/vagrant-confluent-platform) - Vagrantfile to start a virtual machine running the confluent platform: Zookeeper, Kafka, Schema registry and Confluent control centre using cp-ansible
 
 
 
