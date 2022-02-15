@@ -24,6 +24,9 @@ usage: |-
 
   The Cluster linking CRD can then be used to extend this deployment with a synchronous replication of topics.  
   
+  ### Diagram
+  ![solution_diagram](https://lucid.app/publicSegments/view/5346f865-d5d0-47ce-8829-190a52a18532/image.png)
+  
   ### Repository structure
   The Git repository contains the following top directories:
   - **crds** dir containing the Confluent Custom Resource Definitions (CRDs) which are used by the CFK Operator
